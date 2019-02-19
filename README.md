@@ -6,15 +6,16 @@ using SPI mode.
 
 NOTE: Microchip cleverly omits word `SPI` from its data sheet and
 rather uses `Industry Standard 3-Wire Serial I/O` phrase. But
-the device resembles `SPI` with 2 notable exceptions:
+the device resembles `SPI` with 3 notable exceptions:
 
-* after each command the `/CS` pin must be deactivated and activated
+* `CS` pin is active on HIGH  (typical SPI has `/SS` - slave select
+  active in Low)
+* after each command the `CS` pin must be deactivated and activated
   again - otherwise following commands will be ignored
 * after any programming command the `DO` (or `MISO`) pin 
   is `READY/BUSY` pin which can be pooled (even without clock).
-  However `/CS` may not be deactived before this pin comes
+  However `CS` may not be deactived before this pin comes
   to `READY` state (otherwise this pin function is lost).
-
 
 
 > WARNING!
@@ -68,7 +69,7 @@ C:\CH341_DRIVER\LIB\C\CH341DLL.H
 ```
 Then your `CH341_SDK` should be set to `C:\CH341_DRIVER\LIB\C`.
 
-Open and rebuild solution `TODO`
+Open and rebuild solution `VS2010_sol/ch341_spi_93lc86/ch341_spi_93lc86.sln`
 in VisualStudio 2010. There should be no errors.
 
 Connect your `CH341A USB module` to target circuit. Following pins are used:
@@ -80,7 +81,7 @@ Connect your `CH341A USB module` to target circuit. Following pins are used:
 |MISO|Input|master in slave out - SPI|
 |MOSI|Output|master out slave in - SPI|
 |SCK|Output|master clock - SPI|
-|/CS0|Output|Chip select 0, active in Low|
+|CS0|Output|Chip select 0, active in high (93LC86 NOT SPI compatible)|
 
 ----
 
