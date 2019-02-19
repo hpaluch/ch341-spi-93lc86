@@ -91,6 +91,34 @@ be permanently lighting red LED on USB module.
 
 TODO: example program is work in progress
 
+# Bitstream mode
+
+The `ch341dll.h` API offers two interfaces for SPI:
+
+* byte oriented `CH341SetStream()` + `CH341StreamSPI4()` called
+  for each byte. This is convenient API, but
+  may not be flexible enough in complex scenarios (like this EEPROM)
+* bit-stream oriented `CH341Set_D5_D0()` + `CH341BitStreamSPI()` called
+  for each bit-set. Each byte represents (roughly) set of bits
+  `D7` to `D0` that have following meaning:
+
+|Bit|Direction|Description|
+|---|---------|-----------|
+|D7|In|MISO - master in slave out data|
+|D6|In|SPI 5-wire pin?|
+|D5|Out|MOSI - master out slave in data|
+|D4|Out|SPI 5-wire pin?|
+|D3|Out|Clock (automatic?)|
+|D2|Out|CS2|
+|D1|Out|CS1|
+|D0|Out|CS0|
+
+WARNING: I'm unable to find reliable documentation on SPI 5-wire
+standard (common is SPI 4-wire).
+
+WARNING: I did not verify above table (yet).
+
+
 # Output
 
 TODO
