@@ -1,7 +1,21 @@
 # SPI example for 93LC86 EEPROM with CH341 USB adapter 
 
 Here is project of accessing 93LC86 EEPROM
-from [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter].
+from [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]
+using SPI mode.
+
+NOTE: Microchip cleverly omits word `SPI` from its data sheet and
+rather uses `Industry Standard 3-Wire Serial I/O` phrase. But
+the device resembles `SPI` with 2 notable exceptions:
+
+* after each command the `/CS` pin must be deactivated and activated
+  again - otherwise following commands will be ignored
+* after any programming command the `DO` (or `MISO`) pin 
+  is `READY/BUSY` pin which can be pooled (even without clock).
+  However `/CS` may not be deactived before this pin comes
+  to `READY` state (otherwise this pin function is lost).
+
+
 
 > WARNING!
 >
