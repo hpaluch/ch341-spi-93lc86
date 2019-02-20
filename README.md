@@ -21,6 +21,8 @@ the device resembles `SPI` with 3 notable exceptions:
 > WARNING!
 >
 > This project is work in progress.
+>
+> Currently it reads whole 93LC86 to memory and dumps it to screen.
 
 
 Circuit schematic is below:
@@ -90,7 +92,6 @@ NOTE: Direction is from `CH341A USB Module` "view".
 Connect your `CH341 USB module` to your PC. There should
 be permanently lighting red LED on USB module.
 
-TODO: example program is work in progress
 
 # Bitstream mode
 
@@ -122,7 +123,30 @@ WARNING: I did not verify above table (yet).
 
 # Output
 
-TODO
+When you run compiled executable you should see messages like:
+```
+CH341 SPI shift register example
+CH341 version: 33
+Opening device# 0
+Reading 2048 bytes from 93LC86...
+Done. Data dump follows:
+Dump of buffer at 0x0012F754,  bytes 2048
+
+000 90 30 10 b5 02 90 00 00 ff 00 00 01 04 0f 17 61 .0.............a
+010 00 00 00 40 00 00 00 00 48 01 48 01 00 00 00 00 ...@....H.H.....
+...
+```
+Please note that Reading whole EEPROM takes around 10 seconds on my
+VirtualBox VM
+
+
+## Logic Analyzer output
+
+Is pending. I'm currently solving delay issues (it seems that
+CH341A sends data in 7-bit batches - will try to align data this way...)
+These delays are no fatal (it is entirely on Master will when the
+clock will tick) but I may try to reduce them...
+
 
 [CH341PAR.ZIP]: http://www.wch.cn/downloads/file/7.html
 [Getting started with LC CH341A USB conversion module]:  https://github.com/hpaluch/hpaluch.github.io/wiki/Getting-started-with-LC-CH341A-USB-conversion-module
