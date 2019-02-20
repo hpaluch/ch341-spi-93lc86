@@ -142,10 +142,11 @@ VirtualBox VM
 
 ## Logic Analyzer output
 
-Is pending. I'm currently solving delay issues (it seems that
-CH341A sends data in 7-bit batches - will try to align data this way...)
-These delays are no fatal (it is entirely on Master will when the
-clock will tick) but I may try to reduce them...
+There is a little annoyance - the last bit with CS ON is send 
+after quite long  delay - around 1.8ms in Analyzer.
+
+Fortunately it is otherwise OK, because Master is ticking clock
+on his own will.
 
 
 [CH341PAR.ZIP]: http://www.wch.cn/downloads/file/7.html
