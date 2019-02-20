@@ -148,6 +148,13 @@ after quite long  delay - around 1.8ms in Analyzer.
 Fortunately it is otherwise OK, because Master is ticking clock
 on his own will.
 
+In Logic Analyzer I have currently decoder problem  I don't know which
+word size to specify on SPI decoder, because 93LC86 uses different
+command length (in bits).
+
+![PulseView 93LC86 READ  overview](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/read-cmd-overview.png?raw=true)
+
+This is on my TODO list...
 
 [CH341PAR.ZIP]: http://www.wch.cn/downloads/file/7.html
 [Getting started with LC CH341A USB conversion module]:  https://github.com/hpaluch/hpaluch.github.io/wiki/Getting-started-with-LC-CH341A-USB-conversion-module
