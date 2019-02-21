@@ -1,4 +1,4 @@
-# SPI example for 93LC86 EEPROM with CH341 USB adapter 
+# SPI example for Microwire 93LC86 EEPROM with CH341 USB adapter 
 
 Here is project of accessing [93LC86] EEPROM
 from [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]
