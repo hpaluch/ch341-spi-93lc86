@@ -1,117 +1,7 @@
 // ch341_spi_93lc86.cpp : Defines the entry point for the console application.
 //
-
 #include "stdafx.h"
-
-// bit numbers for D7-D0 in bit-stream modes
-#define HPCH_BIT_CS0  0
-#define HPCH_BIT_CS1  1
-#define HPCH_BIT_CS2  2
-#define HPCH_BIT_CLK  3
-#define HPCH_BIT_MOSI 5
-#define HPCH_BIT_MISO 7
-
-#define HPCH_MASK_CS0  (1 << HPCH_BIT_CS0)
-#define HPCH_MASK_CLK  (1 << HPCH_BIT_CLK)
-#define HPCH_MASK_MOSI (1 << HPCH_BIT_MOSI)
-#define HPCH_MASK_MISO (1 << HPCH_BIT_MISO)
-
-
-#define PREFIX_BITS 3
-#define ADDR_BITS 11
-#define ADDR_MASK 0x7ff
-#define DATA_BITS  8
-#define DATA_MASK 0xff
-
-
-// max total bits in bit-stream = bits in DWORD (this program limitation)
-#define HPCH_93C_MAX_BITS 32
-
-//
-// Send 93LC86 command and returns response
-// DWORD iIndex - CH341A device SN, or 0 for 1st device
-// DWORD inData - input data bits
-// DWORD nBits  - number of bits to send in inData
-// DWORD csBits - number of CS off bits to send (can be 0 to leave CS ON)
-// DWORD outData - data bits returned from 93LC86 - only nBits inserted...
-BOOL HpCh_93c_SendCommand(ULONG iIndex, DWORD inData,DWORD nBits, DWORD csBits,DWORD *outData){
-	BOOL ret = FALSE;
-	int i=0;
-	static BYTE ioBuf[HPCH_93C_MAX_BITS];
-
-	if (outData == NULL ){
-		fprintf(stderr,"Parameter outData may not be NULL\n");
-		return FALSE;
-	}
-
-	if (nBits + csBits > HPCH_93C_MAX_BITS){
-		fprintf(stderr,"nBits %u + csBits %u = %u exceeds limit %u\n",nBits,csBits,nBits+csBits, HPCH_93C_MAX_BITS);
-		return FALSE;
-	}
-	// ensure consistent data in buffer
-	memset(ioBuf,0,sizeof(ioBuf));
-
-	for(i=0;i<(int)nBits;i++){
-		BYTE b = 0;
-		BOOL isBitSet = ( inData & (1 << (nBits-i-1))) ? TRUE : FALSE;
-
-		b |= HPCH_MASK_CS0; // activate CS0
-		if (isBitSet){
-			b |= HPCH_MASK_MOSI; // MOSI data output if bit is set
-		}
-		ioBuf[i] = b;
-	}
-
-#if 0
-	// these data are alrady off
-	for(i=0;i<csBits;i++){
-		ioBuf[i+nBits] = 0; // just for reference - CS off, MOSI off
-	}
-#endif
-	if (!CH341BitStreamSPI(iIndex,nBits+csBits,ioBuf)){
-		fprintf(stderr,"CH341BitStreamSPI() failed\n");
-		return FALSE;
-	}
-
-	// now transfer MISO in Bits back to *outData - only nBits transferred
-	*outData = 0;
-	for(i=0;i<(int)nBits;i++){
-		*outData <<= 1;
-		BYTE b = ioBuf[i];
-		if ( b & HPCH_MASK_MISO ){
-			*outData |= 1;
-		}
-	}
-	return TRUE;
-}
-
-BOOL HpCh_93c_Read(ULONG iIndex,DWORD addr,DWORD *outData){
-	DWORD cmd = 0;
-
-	if (outData == NULL ){
-		fprintf(stderr,"Parameter outData may not be NULL\n");
-		return FALSE;
-	}
-	// READ command is 1|10| => 0x6
-	cmd = 0x6 << ( ADDR_BITS + DATA_BITS ); 
-	if ( addr & ~ ADDR_MASK ){
-		fprintf(stderr,"addr 0x%x is too large. Maximum allowed is: 0x%x\n",addr, ADDR_MASK);
-		return FALSE;
-	}
-	cmd |= (addr << DATA_BITS);
-	// we use 2 CS off bits to padd data to 2-bit for USB adapter
-	if (!HpCh_93c_SendCommand(iIndex, cmd,(ADDR_BITS+DATA_BITS+PREFIX_BITS), 2, outData)){
-		return FALSE;
-	}
-	// verify that A0 MISO is 0
-	if ( *outData & ( 1 << DATA_BITS) ){
-		fprintf(stderr,"MISO response on A0 address bit is not 0\n");
-		return FALSE;
-	}
-	*outData &= DATA_MASK; // cut off all non-data bits from input
-
-	return TRUE;
-}
+#include "hpch_93c.h"
 
 void HpCh_DumpBuf(BYTE *buf, int n){
 	const int VALUES_PER_LINE = 16;
@@ -134,15 +24,39 @@ void HpCh_DumpBuf(BYTE *buf, int n){
 					}
 				}				
 			}
-			printf("\n%03x",i);
+			printf("\n0x%04x",i);
 		}
 		printf(" %02x",buf[i]);
 	}
 	printf("\n");
 }
 
+BOOL MyWriteAndReadBack(ULONG iDevIndex,DWORD addr, DWORD data){
+	DWORD outData = 0;
+
+	// test write
+	if (!HpCh_93c_Write(iDevIndex,addr,data)){
+		return FALSE;
+	}
+
+	// read back value
+	if (!HpCh_93c_Read(iDevIndex,addr,&outData)){
+		return FALSE;
+	}
+	if (outData != data){
+		fprintf(stderr,"Written data mismatch at addr 0x%x: 0x%x <> 0x%x\n", addr, data,outData);
+		return FALSE;
+	}
+	return TRUE;
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
+	const DWORD MY_TEST_ADDR = 1024;
+	const DWORD MY_TEST_DATA = 0x34;
+	const DWORD MY_TEST_DATA2 = 0xAB;
+
+	DWORD outData = 0;
 	int addr = 0;
 	BYTE dataBuf[ADDR_MASK+1];
 	int ret = EXIT_SUCCESS;
@@ -168,6 +82,18 @@ int _tmain(int argc, _TCHAR* argv[])
 			ret = EXIT_FAILURE;
 			goto exit1;
 	}
+
+	// write and read back sample data at sample address
+	if (!MyWriteAndReadBack(iDevIndex,MY_TEST_ADDR,MY_TEST_DATA)){
+			ret = EXIT_FAILURE;
+			goto exit1;		
+	}
+	// write and read back another value - to verify that data were really WRITTEN
+	if (!MyWriteAndReadBack(iDevIndex,MY_TEST_ADDR,MY_TEST_DATA2)){
+			ret = EXIT_FAILURE;
+			goto exit1;		
+	}
+
 
 	// the while is here only to have repeated output to Logic Analyzer
 	while(1){

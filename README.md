@@ -1,6 +1,6 @@
 # SPI example for 93LC86 EEPROM with CH341 USB adapter 
 
-Here is project of accessing 93LC86 EEPROM
+Here is project of accessing [93LC86] EEPROM
 from [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]
 using SPI mode.
 
@@ -14,16 +14,23 @@ the device resembles `SPI` with 3 notable exceptions:
   again - otherwise following commands will be ignored
 * after any programming command the `DO` (or `MISO`) pin 
   is `READY/BUSY` pin which can be pooled (even without clock).
-  However `CS` may not be deactived before this pin comes
+  However `CS` may not be deactivated before this pin comes
   to `READY` state (otherwise this pin function is lost).
 
 
 > WARNING!
 >
-> This project is work in progress.
+> This project will overwrite data on connected [93LC86] EEPROM!
 >
-> Currently it reads whole 93LC86 to memory and dumps it to screen.
-
+> Current status:
+> 1. Basic READ and WRITE to [93LC86] EEPROM functions implemented
+> The test program now does following:
+> 1. It writes and reads-back test value to/from EEPROM at address 1024 (0x400)
+> 1. It dumps contents of whole EEPROM to console
+>
+> WARNING!
+> Once my VirtualBox VM with XP SP3 (where I run my programs) 
+> suddenly rebooted. But it (fortunately) can't be reproduced again...
 
 Circuit schematic is below:
 
@@ -37,7 +44,7 @@ Hardware:
   need [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]
   I got my from Amazon.de as [DollaTek CH341A USB zu UART/IIC/SPI/TTL/ISP Adapter EPP/MEM Parallelwandler]. If you never used this module
   please see my article [Getting started with LC CH341A USB conversion module]
-* EEPROM 93LC86, 100nF ceramic capacitor.
+* EEPROM [93LC86], 100nF ceramic capacitor.
 
 Software:
 
@@ -128,34 +135,48 @@ When you run compiled executable you should see messages like:
 CH341 SPI shift register example
 CH341 version: 33
 Opening device# 0
+DEBUG: WRITE succeed after 1 ms wait
+DEBUG: WRITE succeed after 1 ms wait
 Reading 2048 bytes from 93LC86...
 Done. Data dump follows:
-Dump of buffer at 0x0012F754,  bytes 2048
+Dump of buffer at 0x0012F724,  bytes 2048
 
-000 90 30 10 b5 02 90 00 00 ff 00 00 01 04 0f 17 61 .0.............a
-010 00 00 00 40 00 00 00 00 48 01 48 01 00 00 00 00 ...@....H.H.....
+0x0000 90 30 10 b5 02 90 00 00 ff 00 00 01 04 0f 17 61 .0.............a
+0x0010 00 00 00 40 00 00 00 00 48 01 48 01 00 00 00 00 ...@....H.H.....
 ...
+# here is test byte 0xab...
+0x0400 ab ca ca ca ca ca ca ca ca ca ca ca ca ca ca ca ................
 ```
+
+NOTE: you can see lots of 0xca bytes in my EEPROM because 
+I already tried pattern write (WRAL) command on
+my [STM32 Nucleo board]
+
+
 Please note that Reading whole EEPROM takes around 10 seconds on my
 VirtualBox VM
 
 
 ## Logic Analyzer output
 
-There is a little annoyance - the last bit with CS ON is send 
-after quite long  delay - around 1.8ms in Analyzer.
+NOTES on USB: According to my curent knowledge the USB PC<->CH341A
+adapter communication is done using packets with up to 32 instructions.
+The packets are send/received each 1ms or so (this is how such
+USB device works). Therefore there can be (and are) inherent delays.
 
-Fortunately it is otherwise OK, because Master is ticking clock
-on his own will.
+Fortunately it is not problem, because there are no (low range)
+constraints on SPI master clock timings.
 
 In Logic Analyzer I have currently decoder problem  I don't know which
-word size to specify on SPI decoder, because 93LC86 uses different
+word size to specify on SPI decoder, because [93LC86] uses different
 command length (in bits).
 
 ![PulseView 93LC86 READ  overview](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/read-cmd-overview.png?raw=true)
 
 This is on my TODO list...
 
+[STM32 Nucleo board](https://github.com/hpaluch-pil/nucleo-93cxx) 
+[93LC86]: http://ww1.microchip.com/downloads/en/DeviceDoc/21131F.pdf
 [CH341PAR.ZIP]: http://www.wch.cn/downloads/file/7.html
 [Getting started with LC CH341A USB conversion module]:  https://github.com/hpaluch/hpaluch.github.io/wiki/Getting-started-with-LC-CH341A-USB-conversion-module
 [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]:http://www.chinalctech.com/index.php?_m=mod_product&_a=view&p_id=1220
