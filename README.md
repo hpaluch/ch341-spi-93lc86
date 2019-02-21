@@ -15,7 +15,7 @@ Here are key differences of `Microwire` [93LC86] from SPI:
 * after each command the `CS` pin must be deactivated and activated
   again - otherwise following commands will be ignored
 * after any programming command the `DO` (or `MISO`) pin 
-  is `READY/BUSY` pin which can be pooled (even without clock).
+  is `READY/BUSY` pin which can be polled (even without clock).
   However `CS` may not be deactivated before this pin comes
   to `READY` state (otherwise this pin function is lost).
 
