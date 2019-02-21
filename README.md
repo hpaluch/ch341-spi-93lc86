@@ -4,7 +4,7 @@ Here is project of accessing [93LC86] EEPROM
 from [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]
 using SPI mode.
 
-NOTE: Thi [93LC86] is actually `Microwire` device which is
+NOTE: The [93LC86] is actually `Microwire` device which is
 similar to SPI but definitely not same.
 There is nice [Sigrok Microwire decoder] page and it also includes
 link to [Microwire Specs]
