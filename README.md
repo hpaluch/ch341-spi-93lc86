@@ -4,10 +4,12 @@ Here is project of accessing [93LC86] EEPROM
 from [CH341A USB to UART/IIC/SPI/TTL/ISP adapter EPP/MEM Parallel converter]
 using SPI mode.
 
-NOTE: Microchip cleverly omits word `SPI` from its data sheet and
-rather uses `Industry Standard 3-Wire Serial I/O` phrase. But
-the device resembles `SPI` with 3 notable exceptions:
+NOTE: Thi [93LC86] is actually `Microwire` device which is
+similar to SPI but definitely not same.
+There is nice [Sigrok Microwire decoder] page and it also includes
+link to [Microwire Specs]
 
+Here are key differences of `Microwire` [93LC86] from SPI:
 * `CS` pin is active on HIGH  (typical SPI has `/SS` - slave select
   active in Low)
 * after each command the `CS` pin must be deactivated and activated
@@ -90,7 +92,7 @@ Connect your `CH341A USB module` to target circuit. Following pins are used:
 |MISO|Input|master in slave out - SPI|
 |MOSI|Output|master out slave in - SPI|
 |SCK|Output|master clock - SPI|
-|CS0|Output|Chip select 0, active in high (93LC86 NOT SPI compatible)|
+|CS0|Output|Chip select 0, active in high (93LC86 is Microwire but generally NOT SPI compatible)|
 
 ----
 
@@ -159,7 +161,7 @@ VirtualBox VM
 
 ## Logic Analyzer output
 
-NOTES on USB: According to my curent knowledge the USB PC<->CH341A
+NOTES on USB: According to my current knowledge the USB PC<->CH341A
 adapter communication is done using packets with up to 32 instructions.
 The packets are send/received each 1ms or so (this is how such
 USB device works). Therefore there can be (and are) inherent delays.
@@ -167,14 +169,17 @@ USB device works). Therefore there can be (and are) inherent delays.
 Fortunately it is not problem, because there are no (low range)
 constraints on SPI master clock timings.
 
-In Logic Analyzer I have currently decoder problem  I don't know which
-word size to specify on SPI decoder, because [93LC86] uses different
-command length (in bits).
+
+I finally found root cause why the PulseView's 93Cxx decoder did
+not work. It was because [93LC86] is `Microwire` not `SPI` device
+as described on [Sigrok Microwire decoder]  page.
+
+So now it works perfectly as can be seen here:
 
 ![PulseView 93LC86 READ  overview](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/read-cmd-overview.png?raw=true)
 
-This is on my TODO list...
-
+[Microwire Specs]: http://www.ti.com/lit/an/snoa743/snoa743.pdf
+[Sigrok Microwire decoder]: https://sigrok.org/blog/new-protocol-decoder-microwire
 [STM32 Nucleo board]: https://github.com/hpaluch-pil/nucleo-93cxx 
 [93LC86]: http://ww1.microchip.com/downloads/en/DeviceDoc/21131F.pdf
 [CH341PAR.ZIP]: http://www.wch.cn/downloads/file/7.html
