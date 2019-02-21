@@ -175,7 +175,7 @@ command length (in bits).
 
 This is on my TODO list...
 
-[STM32 Nucleo board](https://github.com/hpaluch-pil/nucleo-93cxx) 
+[STM32 Nucleo board]: https://github.com/hpaluch-pil/nucleo-93cxx 
 [93LC86]: http://ww1.microchip.com/downloads/en/DeviceDoc/21131F.pdf
 [CH341PAR.ZIP]: http://www.wch.cn/downloads/file/7.html
 [Getting started with LC CH341A USB conversion module]:  https://github.com/hpaluch/hpaluch.github.io/wiki/Getting-started-with-LC-CH341A-USB-conversion-module
