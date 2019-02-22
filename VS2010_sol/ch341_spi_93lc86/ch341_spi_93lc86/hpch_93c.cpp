@@ -117,7 +117,7 @@ BOOL HpCh_93c_Ewen(ULONG iIndex){
 	// 1|00|11 where last 2-bit are taken from ADDRESS
 	// = 0x13
 	DWORD cmd = 0x13 << ( ADDR_BITS - 2);
-	// NOTE: otuData is ignored - there is no meaningful feedback from 93LC86 on this command
+	// NOTE: outData is ignored - there is no meaningful feedback from 93LC86 on this command
 	ret =  HpCh_93c_SendCommand(iIndex, cmd,(ADDR_BITS+PREFIX_BITS), 1, &outData);
 	if (!ret){
 		fprintf(stderr,"%s failed\n",__FUNCTION__);
@@ -131,7 +131,7 @@ BOOL HpCh_93c_Ewds(ULONG iIndex){
 	// 1|00|00 where last 2-bit are taken from ADDRESS
 	// = 0x10
 	DWORD cmd = 0x10 << ( ADDR_BITS - 2);
-	// NOTE: otuData is ignored - there is no meaningful feedback from 93LC86 on this command
+	// NOTE: outData is ignored - there is no meaningful feedback from 93LC86 on this command
 	ret =  HpCh_93c_SendCommand(iIndex, cmd,(ADDR_BITS+PREFIX_BITS), 1, &outData);
 	if (!ret){
 		fprintf(stderr,"%s failed\n",__FUNCTION__);
@@ -167,7 +167,7 @@ BOOL HpCh_93c_Write(ULONG iIndex,DWORD addr,DWORD inData){
 
 	// NOTE: csBits must be 0 to keep MISO READ/BUSY status function!!!
 	if (!HpCh_93c_SendCommand(iIndex, cmd,(ADDR_BITS+DATA_BITS+PREFIX_BITS), 0, &outData)){
-		goto exit1; // try to disable writes first...
+		goto exit2; // try to disable writes first...
 	}
 
 	// now we need to poll for results
@@ -176,7 +176,7 @@ BOOL HpCh_93c_Write(ULONG iIndex,DWORD addr,DWORD inData){
 		outData = 0;
 		nanosleep( 1 * 1000 * 1000 ); // 1ms
 		if (!HpCh_93c_SendCommand(iIndex, cmd, 1, 0, &outData)){
-			goto exit1; // try to disable writes first...
+			goto exit2; // try to disable writes first...
 		}
 		if (outData &1){
 			printf("DEBUG: WRITE succeed after %u ms wait\n",i+1);
@@ -186,14 +186,14 @@ BOOL HpCh_93c_Write(ULONG iIndex,DWORD addr,DWORD inData){
 	}
 	if (!ret){
 		fprintf(stderr,"ERROR: Timeout %u ms after WRITE\n",i);
-		// try to lower CS and disable WRITes....
-		cmd = 0; outData = 0;
-		HpCh_93c_SendCommand(iIndex, cmd, 1, 1, &outData);
-		goto exit1; // just for reference...
 	}
+exit2:
+	// always lower CS after polling...
+	cmd = 0; outData = 0;
+	HpCh_93c_SendCommand(iIndex, cmd, 1, 1, &outData);
 
 	// try to disable write on any circumstances
-exit1:
+//exit1: // unused label
 	if (!HpCh_93c_Ewds(iIndex)){
 		ret = FALSE;
 	}
