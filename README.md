@@ -178,6 +178,39 @@ So now it works perfectly as can be seen here:
 
 ![PulseView 93LC86 READ  overview](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/read-cmd-overview.png?raw=true)
 
+Thanks to [PulseView Triggers] it is  incredibly easy to chapter
+start of communications (I just used _rising edge_ trigger on channel
+`CH1` (shown as `D0` in PulseView) and connected to `CS0` signal.
+
+NOTE: You need to run our exe program for the first time to ensure
+that `CS0` ends low before next run. And then starting trigger capture
+in PulseView
+
+Here are screenshots from whole `WRITE` cycle:
+1. `EWEN` (Write Enable)
+1. `WRITE` (Write one byte)
+1. `EWDS` (Write disable)
+
+
+So `EWEN`:
+
+![PulseView 93LC86 EWEN](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/ewen-cmd.png?raw=true)
+
+Followed by `WRITE`:
+
+![PulseView 93LC86 WRITE](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/write-cmd.png?raw=true)
+
+> NOTE: The whole WRITE can't fit on screen because there is then large delay before
+> remainder of data (cause by limited packet size on USB, followed by 
+> USB polling period - minimum 1ms for Full speed (does it applies for CH341A?).
+
+
+And finally `EWDS`
+
+![PulseView 93LC86 EWDS](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/ewds-cmd.png?raw=true)
+
+
+[PulseView Triggers]: https://sigrok.org/doc/pulseview/0.4.1/manual.html#_triggers
 [Microwire Specs]: http://www.ti.com/lit/an/snoa743/snoa743.pdf
 [Sigrok Microwire decoder]: https://sigrok.org/blog/new-protocol-decoder-microwire
 [STM32 Nucleo board]: https://github.com/hpaluch-pil/nucleo-93cxx 
