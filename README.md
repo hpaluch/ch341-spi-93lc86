@@ -58,8 +58,8 @@ Software:
 
 The CH341A adapter must be setup following way:
 * jumper set to `I2C/SPI` mode
-* voltage set to 5V TTL logic (this is because used CD4013 D Flip-Flop
-  would be near by required minimum voltage in case of 3.3V and too slow)
+* voltage set to 5V TTL logic (to ensure highest possible
+  speed and response of [93LC86]
 * please see picture below for correct configuration:
 
 ![USB CH341A adapter configuration](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/images/ch341-spi-5v.jpg?raw=true)
@@ -68,7 +68,7 @@ The CH341A adapter must be setup following way:
 Software setup:
 *  Download and install [CH341PAR.ZIP] - USB driver for CH341 chip
    in Parallel mode (EPP, MEM). This driver is valid 
-   also for **I2C mode and SPI mode** (yes - even when it is marked parallel).
+   also for **I2C mode and SPI mode** (yes - even when it is marked _parallel_).
 *  install VisualSutdio 2010
 
 Create environment variable `CH341_SDK` that should point to extracted
