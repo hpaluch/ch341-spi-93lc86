@@ -178,7 +178,7 @@ So now it works perfectly as can be seen here:
 
 ![PulseView 93LC86 READ  overview](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/read-cmd-overview.png?raw=true)
 
-Thanks to [PulseView Triggers] it is  incredibly easy to chapter
+Thanks to [PulseView Triggers] it is  incredibly easy to capture
 start of communications (I just used _rising edge_ trigger on channel
 `CH1` (shown as `D0` in PulseView) and connected to `CS0` signal.
 
@@ -192,11 +192,11 @@ Here are screenshots from whole `WRITE` cycle:
 1. `EWDS` (Write disable)
 
 
-So `EWEN`:
+So `EWEN` (Write Enable):
 
 ![PulseView 93LC86 EWEN](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/ewen-cmd.png?raw=true)
 
-Followed by `WRITE`:
+Followed by `WRITE` (Write one byte of data):
 
 ![PulseView 93LC86 WRITE](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/write-cmd.png?raw=true)
 
@@ -205,7 +205,7 @@ Followed by `WRITE`:
 > USB polling period - minimum 1ms for Full speed (does it applies for CH341A?).
 
 
-And finally `EWDS`
+And finally `EWDS` (Write Disable):
 
 ![PulseView 93LC86 EWDS](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/ewds-cmd.png?raw=true)
 
