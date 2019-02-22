@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "hpch_93c.h"
 
+// BUG: does not support n != VALUES_PER_LINE - TODO....
 void HpCh_DumpBuf(BYTE *buf, int n){
 	const int VALUES_PER_LINE = 16;
 
