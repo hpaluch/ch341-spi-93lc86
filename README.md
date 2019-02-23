@@ -119,7 +119,7 @@ The `ch341dll.h` API offers two interfaces for SPI:
 |D6|In|SPI 5-wire pin?|
 |D5|Out|MOSI - master out slave in data|
 |D4|Out|SPI 5-wire pin?|
-|D3|Out|Clock (automatic?)|
+|D3|Out|Clock (automatic cycle on each bit-stream byte transfer)|
 |D2|Out|CS2|
 |D1|Out|CS1|
 |D0|Out|CS0|
@@ -208,6 +208,16 @@ Followed by `WRITE` (Write one byte of data):
 And finally `EWDS` (Write Disable):
 
 ![PulseView 93LC86 EWDS](https://github.com/hpaluch/ch341-spi-93lc86//blob/master/PulseView/ewds-cmd.png?raw=true)
+
+# Known Bugs and Limitations
+
+* only 8-bit data organization (`ORG` pin Low) supported
+* the `HpCh_93c_Read()` function does not utilize sequential `READ`
+  (reading more than 1-byte in single command) - it would be faster.
+* the `BOOL HpCh_93c_SendCommand()` function has hard limit of
+  maximum total 32 transferred bits in whole command.
+* function `void HpCh_DumpBuf(BYTE *buf, int n)` works correctly
+  for `n` dividable by `16` (or constant `VALUES_PER_LINE`) only.
 
 
 [PulseView Triggers]: https://sigrok.org/doc/pulseview/0.4.1/manual.html#_triggers
